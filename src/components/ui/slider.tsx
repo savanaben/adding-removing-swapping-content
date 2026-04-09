@@ -9,13 +9,17 @@ const Slider = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SliderPrimitive.Root
     ref={ref}
-    className={cn('relative flex w-full touch-none select-none items-center', className)}
+    className={cn(
+      'group relative flex w-full touch-none select-none items-center',
+      'data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed',
+      className,
+    )}
     {...props}
   >
-    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-slate-100">
-      <SliderPrimitive.Range className="absolute h-full bg-slate-900" />
+    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-slate-100 transition-colors group-data-[disabled]:bg-slate-200">
+      <SliderPrimitive.Range className="absolute h-full bg-slate-900 transition-colors group-data-[disabled]:bg-slate-400" />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-slate-900 bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-slate-900 bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-data-[disabled]:border-slate-400 group-data-[disabled]:bg-slate-200" />
   </SliderPrimitive.Root>
 ))
 Slider.displayName = SliderPrimitive.Root.displayName

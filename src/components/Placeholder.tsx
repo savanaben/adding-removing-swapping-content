@@ -63,7 +63,7 @@ function ReplacementPanel({
 
 export function Placeholder() {
   const snap = useSnapshot(store)
-  const { mode, width, height, moreComingText, matchHeightToContent } =
+  const { mode, widthPercent, height, moreComingText, matchHeightToContent, alignment } =
     snap.placeholderConfig
   const { isSwapped, swapAnimationPhase, swapInMarkdown, theme } = snap
 
@@ -79,7 +79,9 @@ export function Placeholder() {
     theme === 'dark' ? 'text-[#c7c7c7]' : 'text-[#696969]'
 
   const fixedBlankHeight = Math.max(40, height)
-  const widthStyle = width > 0 ? `${width}px` : undefined
+  /** More coming is always full width; blank below 100% uses that % of column. */
+  const blankWidthExplicit =
+    mode === 'blank' && widthPercent < 100 ? `${widthPercent}%` : null
   const heightStyle =
     mode === 'moreComing' || (mode === 'blank' && matchHeightToContent)
       ? 'auto'
@@ -87,14 +89,21 @@ export function Placeholder() {
   /** Blank + match height to content: invisible replacement copy sizes the grid. */
   const blankAutoHeight = mode === 'blank' && matchHeightToContent
 
-  const containerClass = cn(
-    'relative inline-grid w-full max-w-full align-top',
-    width === 0 && 'w-full',
-  )
-  const containerStyle = width > 0 ? { width: widthStyle, maxWidth: '100%' } : undefined
+  const blankJustifySelf =
+    mode === 'blank' && blankWidthExplicit
+      ? alignment === 'left'
+        ? 'justify-self-start'
+        : alignment === 'center'
+          ? 'justify-self-center'
+          : 'justify-self-end'
+      : null
+
+  /** Full column width always so swapped-in content uses passage width, not the narrow placeholder box. */
+  const containerClass =
+    'relative inline-grid w-full max-w-full min-w-0 align-top'
 
   return (
-    <div id="placeholder-anchor" className={containerClass} style={containerStyle}>
+    <div id="placeholder-anchor" className={containerClass}>
       {/* Keep mounted for entire blank+auto swap: removing this when isSwapped flips true + AnimatePresence mode="wait" leaves a frame with no row height (stutter). */}
       {blankAutoHeight && (
         <div
@@ -118,15 +127,27 @@ export function Placeholder() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             className={cn(
-              'relative z-10 col-start-1 row-start-1 flex w-full',
+              'relative z-10 col-start-1 row-start-1 flex max-w-full',
               placeholderSurface,
+              blankWidthExplicit
+                ? cn(
+                    'w-auto',
+                    mode === 'blank'
+                      ? blankJustifySelf
+                      : 'justify-self-start',
+                  )
+                : 'w-full',
               mode === 'moreComing'
                 ? 'flex-col items-center gap-[16px] p-4'
                 : 'items-center justify-center',
               blankAutoHeight && 'h-full min-h-[40px]',
             )}
             style={{
-              width: blankAutoHeight ? undefined : width > 0 ? widthStyle : '100%',
+              ...(blankWidthExplicit
+                ? { width: blankWidthExplicit, maxWidth: '100%' }
+                : blankAutoHeight
+                  ? {}
+                  : { width: '100%' }),
               height: blankAutoHeight ? undefined : heightStyle,
             }}
           >
@@ -150,7 +171,7 @@ export function Placeholder() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="relative z-10 col-start-1 row-start-1 w-full"
+            className="relative z-10 col-start-1 row-start-1 w-full min-w-0"
           >
             <ReplacementPanel markdown={swapInMarkdown} theme={theme} />
           </motion.div>
