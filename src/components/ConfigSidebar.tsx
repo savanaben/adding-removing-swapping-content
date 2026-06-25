@@ -42,6 +42,7 @@ export function ConfigSidebar() {
     moreComingText,
     matchHeightToContent,
     alignment,
+    highlightOnSwap,
   } = snap.placeholderConfig
 
   return (
@@ -204,8 +205,29 @@ export function ConfigSidebar() {
         </div>
       )}
 
+      <div className="flex flex-col gap-2">
+        <Label className="text-xs font-bold">Highlight on Swap</Label>
+        <Select
+          value={highlightOnSwap ? 'yes' : 'no'}
+          onValueChange={(v) => {
+            store.placeholderConfig.highlightOnSwap = v === 'yes'
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="yes">Yes</SelectItem>
+            <SelectItem value="no">No</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex flex-col gap-3 border-t border-slate-200 pt-5">
         <h2 className="text-[0.9rem] font-semibold tracking-tight">Content swapped in</h2>
+        <SidebarInfo>
+          this section is just for prototype testing of different lengths of content.
+        </SidebarInfo>
         <p className="text-[0.65rem] leading-snug text-slate-500">
           Markdown supported (headings, lists, paragraphs). Link an image:{' '}
           <code className="rounded bg-slate-100 px-1 text-[0.6rem]">

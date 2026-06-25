@@ -18,6 +18,8 @@ export const store = proxy({
     height: 100,
     /** Horizontal placement of the blank placeholder when width is less than full column. */
     alignment: 'left' as 'left' | 'center' | 'right',
+    /** When true, swapped-in content uses purple highlight treatment; when false, blends with passage. */
+    highlightOnSwap: true,
     moreComingText: 'Later you will read the rest of the passage.',
   },
 

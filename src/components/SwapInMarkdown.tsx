@@ -8,15 +8,22 @@ export function SwapInMarkdown({
   markdown,
   eagerImages = false,
   theme = 'default',
+  highlightOnSwap = true,
 }: {
   markdown: string
   /** Use for invisible measure layers so dimensions match before swap (lazy imgs stay 0-height briefly). */
   eagerImages?: boolean
   theme?: 'default' | 'beige' | 'dark'
+  highlightOnSwap?: boolean
 }) {
   const components = useMemo<Components>(() => {
-    const imgBorder =
-      theme === 'dark' ? 'border-[#c4b5fd]' : 'border-purple-200'
+    const imgBorder = highlightOnSwap
+      ? theme === 'dark'
+        ? 'border-[#c4b5fd]'
+        : 'border-purple-200'
+      : theme === 'dark'
+        ? 'border-[#555]'
+        : 'border-slate-200'
     return {
       a: ({ href, children, className, ...props }) => (
         <a
@@ -24,7 +31,8 @@ export function SwapInMarkdown({
           target="_blank"
           rel="noreferrer noopener"
           className={cn(
-            theme === 'dark' &&
+            highlightOnSwap &&
+              theme === 'dark' &&
               'font-medium text-[#e9d5ff] underline underline-offset-2 hover:text-white',
             className,
           )}
@@ -47,7 +55,7 @@ export function SwapInMarkdown({
         />
       ),
     }
-  }, [eagerImages, theme])
+  }, [eagerImages, theme, highlightOnSwap])
 
   return (
     <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>

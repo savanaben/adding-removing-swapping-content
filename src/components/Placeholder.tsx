@@ -33,12 +33,14 @@ function ReplacementPanel({
   markdown,
   measureLayer = false,
   theme,
+  highlightOnSwap = true,
 }: {
   className?: string
   markdown: string
   /** Invisible stack layer: eager-load images so row height matches swapped-in prose. */
   measureLayer?: boolean
   theme: 'default' | 'beige' | 'dark'
+  highlightOnSwap?: boolean
 }) {
   const isDarkSwap = theme === 'dark'
 
@@ -46,9 +48,13 @@ function ReplacementPanel({
     <div
       className={cn(
         'rounded-md p-4 max-w-none leading-[1.4] prose prose-p:my-3 prose-p:leading-[1.4] prose-headings:my-4 prose-headings:leading-[1.4] prose-ul:my-3 prose-li:my-0.5 prose-li:leading-[1.4] [&>*:first-child]:!mt-0 [&>*:last-child]:!mb-0',
-        isDarkSwap
-          ? 'bg-[#2a1250] ring-4 ring-[#d8b4fe] text-[#EBEBEB] prose-headings:text-[#EBEBEB] prose-p:text-[#EBEBEB] prose-strong:text-[#EBEBEB] prose-li:text-[#EBEBEB] prose-li:marker:text-[#d8b4fe]'
-          : 'bg-purple-100 ring-4 ring-purple-500 prose-slate',
+        highlightOnSwap
+          ? isDarkSwap
+            ? 'bg-[#2a1250] ring-4 ring-[#d8b4fe] text-[#EBEBEB] prose-headings:text-[#EBEBEB] prose-p:text-[#EBEBEB] prose-strong:text-[#EBEBEB] prose-li:text-[#EBEBEB] prose-li:marker:text-[#d8b4fe]'
+            : 'bg-purple-100 ring-4 ring-purple-500 prose-slate'
+          : isDarkSwap
+            ? 'prose-invert'
+            : 'prose-slate',
         className,
       )}
     >
@@ -56,6 +62,7 @@ function ReplacementPanel({
         markdown={markdown}
         eagerImages={measureLayer}
         theme={theme}
+        highlightOnSwap={highlightOnSwap}
       />
     </div>
   )
@@ -63,7 +70,7 @@ function ReplacementPanel({
 
 export function Placeholder() {
   const snap = useSnapshot(store)
-  const { mode, widthPercent, height, moreComingText, matchHeightToContent, alignment } =
+  const { mode, widthPercent, height, moreComingText, matchHeightToContent, alignment, highlightOnSwap } =
     snap.placeholderConfig
   const { isSwapped, swapAnimationPhase, swapInMarkdown, theme } = snap
 
@@ -110,7 +117,7 @@ export function Placeholder() {
           className="pointer-events-none invisible col-start-1 row-start-1 w-full"
           aria-hidden
         >
-          <ReplacementPanel markdown={swapInMarkdown} measureLayer theme={theme} />
+          <ReplacementPanel markdown={swapInMarkdown} measureLayer theme={theme} highlightOnSwap={highlightOnSwap} />
         </div>
       )}
       <AnimatePresence mode="wait">
@@ -173,7 +180,7 @@ export function Placeholder() {
             transition={{ duration: 0.4 }}
             className="relative z-10 col-start-1 row-start-1 w-full min-w-0"
           >
-            <ReplacementPanel markdown={swapInMarkdown} theme={theme} />
+            <ReplacementPanel markdown={swapInMarkdown} theme={theme} highlightOnSwap={highlightOnSwap} />
           </motion.div>
         )}
       </AnimatePresence>
